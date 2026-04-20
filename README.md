@@ -21,26 +21,11 @@ npm run dev
 Crie um arquivo `.env` com:
 
 ```bash
-SURVEY_PROXY_TARGET=https://script.google.com/macros/s/SEU_SCRIPT_ID/exec
-```
-
-Essa variavel e lida apenas pelo servidor do Vite e nao vai para o bundle do frontend.
-
-O frontend passa a chamar apenas:
-
-```txt
-/api/survey
-```
-
-Para producao estatica no GitHub Pages, crie tambem um `.env.production` com:
-
-```bash
 VITE_SURVEY_API_URL=https://script.google.com/macros/s/SEU_SCRIPT_ID/exec
 ```
 
-Assim o bundle publicado chama o Apps Script diretamente, sem depender do proxy do Vite.
-
-Se o proxy nao estiver configurado, o dashboard continua em estado vazio ou mostra erro orientando a configuracao.
+Essa variavel e usada tanto no desenvolvimento quanto no build publicado.
+O frontend chama o Apps Script diretamente, sem proxy local.
 
 ## Formato esperado da API
 
@@ -161,13 +146,12 @@ O frontend ja espera e exibe os campos-base abaixo.
 
 Em [src/services/api.js](C:/Users/edils/Downloads/lovable/dashboard/src/services/api.js), a funcao `fetchSurveyData()` ja esta preparada para:
 
-1. Chamar apenas o caminho relativo `/api/survey`
+1. Chamar diretamente a URL publica do Apps Script
 2. Enviar `GET` com o filtro de periodo selecionado
 3. Normalizar a resposta para a UI nao quebrar com payloads incompletos
 4. Aceitar tanto o formato novo com `surveys` quanto um formato legado com apenas um dataset
 
-Em desenvolvimento local, o proxy fica em [vite.config.js](C:/Users/edils/Downloads/lovable/dashboard/vite.config.js) e usa `SURVEY_PROXY_TARGET` para encaminhar a requisicao ao Apps Script sem expor a URL no client bundle.
-Em producao estatica, [src/services/api.js](C:/Users/edils/Downloads/lovable/dashboard/src/services/api.js) usa `VITE_SURVEY_API_URL` quando essa variavel existe.
+Em desenvolvimento e producao, [src/services/api.js](C:/Users/edils/Downloads/lovable/dashboard/src/services/api.js) usa `VITE_SURVEY_API_URL`.
 
 Fluxo sugerido:
 
@@ -175,11 +159,9 @@ Fluxo sugerido:
 2. Use Apps Script para agregar os dados por categoria
 3. Monte um JSON final com `surveys.contratante` e `surveys.prestador`
 4. Publique o script como Web App
-5. Em desenvolvimento local, aponte `SURVEY_PROXY_TARGET` para a URL publicada
+5. Aponte `VITE_SURVEY_API_URL` para a URL publicada
 
 ## Sobre seguranca
-
-Para desenvolvimento local, esta correcao ja evita expor a URL do Apps Script no frontend.
 
 Para producao, existe uma limitacao importante:
 

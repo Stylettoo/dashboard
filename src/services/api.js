@@ -3,15 +3,16 @@ import {
   normalizeSurveyResponse,
 } from '../types/survey';
 
-export const SURVEY_API_PATH = '/api/survey';
 const PUBLIC_SURVEY_API_URL = import.meta.env.VITE_SURVEY_API_URL || '';
 
 function getSurveyApiUrl() {
-  if (PUBLIC_SURVEY_API_URL) {
-    return PUBLIC_SURVEY_API_URL;
+  if (!PUBLIC_SURVEY_API_URL) {
+    throw new Error(
+      'API de survey nao configurada. Defina VITE_SURVEY_API_URL para apontar ao Apps Script.',
+    );
   }
 
-  return new URL(SURVEY_API_PATH, window.location.origin).toString();
+  return PUBLIC_SURVEY_API_URL;
 }
 
 /**
@@ -20,8 +21,7 @@ function getSurveyApiUrl() {
  * Para integrar com Google Sheets + Google Apps Script:
  * 1. Crie um Apps Script publicado como Web App.
  * 2. Faca o script responder JSON no formato esperado pelo dashboard.
- * 3. Defina SURVEY_PROXY_TARGET no ambiente de desenvolvimento local.
- * 4. Em producao, use um backend/proxy proprio se quiser esconder a URL real.
+ * 3. Defina VITE_SURVEY_API_URL apontando ao Apps Script publicado.
  *
  * @param {{ period?: string, signal?: AbortSignal }} [options]
  */
@@ -43,11 +43,7 @@ export async function fetchSurveyData(options = {}) {
 
   if (!response.ok) {
     if (response.status === 404 || response.status === 502 || response.status === 504) {
-      throw new Error(
-        PUBLIC_SURVEY_API_URL
-          ? 'A API publica de survey nao respondeu corretamente.'
-          : 'Proxy de survey nao configurado. Defina SURVEY_PROXY_TARGET no ambiente do Vite para apontar ao Apps Script.',
-      );
+      throw new Error('A API publica de survey nao respondeu corretamente.');
     }
 
     throw new Error('A API respondeu com erro ao carregar o survey.');
