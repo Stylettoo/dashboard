@@ -7,9 +7,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    // Use base "./" so the exported build works on GitHub Pages project sites.
-    // If you prefer a repository-specific path later, replace with "/repo-name/".
-    base: './',
+    base: '/dashboard/',
     server: proxyTarget
       ? {
           proxy: {
