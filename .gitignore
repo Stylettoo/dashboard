@@ -3,5 +3,6 @@ dist
 .DS_Store
 *.local
 .env
+.env.production
 vite-dev.log
 vite-dev.err.log

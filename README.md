@@ -32,6 +32,14 @@ O frontend passa a chamar apenas:
 /api/survey
 ```
 
+Para producao estatica no GitHub Pages, crie tambem um `.env.production` com:
+
+```bash
+VITE_SURVEY_API_URL=https://script.google.com/macros/s/SEU_SCRIPT_ID/exec
+```
+
+Assim o bundle publicado chama o Apps Script diretamente, sem depender do proxy do Vite.
+
 Se o proxy nao estiver configurado, o dashboard continua em estado vazio ou mostra erro orientando a configuracao.
 
 ## Formato esperado da API
@@ -159,6 +167,7 @@ Em [src/services/api.js](C:/Users/edils/Downloads/lovable/dashboard/src/services
 4. Aceitar tanto o formato novo com `surveys` quanto um formato legado com apenas um dataset
 
 Em desenvolvimento local, o proxy fica em [vite.config.js](C:/Users/edils/Downloads/lovable/dashboard/vite.config.js) e usa `SURVEY_PROXY_TARGET` para encaminhar a requisicao ao Apps Script sem expor a URL no client bundle.
+Em producao estatica, [src/services/api.js](C:/Users/edils/Downloads/lovable/dashboard/src/services/api.js) usa `VITE_SURVEY_API_URL` quando essa variavel existe.
 
 Fluxo sugerido:
 

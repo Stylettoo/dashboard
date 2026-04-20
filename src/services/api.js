@@ -4,6 +4,15 @@ import {
 } from '../types/survey';
 
 export const SURVEY_API_PATH = '/api/survey';
+const PUBLIC_SURVEY_API_URL = import.meta.env.VITE_SURVEY_API_URL || '';
+
+function getSurveyApiUrl() {
+  if (PUBLIC_SURVEY_API_URL) {
+    return PUBLIC_SURVEY_API_URL;
+  }
+
+  return new URL(SURVEY_API_PATH, window.location.origin).toString();
+}
 
 /**
  * Busca dados reais do survey a partir de uma API externa.
@@ -18,7 +27,7 @@ export const SURVEY_API_PATH = '/api/survey';
  */
 export async function fetchSurveyData(options = {}) {
   const { period = 'all', signal } = options;
-  const url = new URL(SURVEY_API_PATH, window.location.origin);
+  const url = new URL(getSurveyApiUrl());
 
   if (period && period !== 'all') {
     url.searchParams.set('period', period);
@@ -35,7 +44,9 @@ export async function fetchSurveyData(options = {}) {
   if (!response.ok) {
     if (response.status === 404 || response.status === 502 || response.status === 504) {
       throw new Error(
-        'Proxy de survey nao configurado. Defina SURVEY_PROXY_TARGET no ambiente do Vite para apontar ao Apps Script.',
+        PUBLIC_SURVEY_API_URL
+          ? 'A API publica de survey nao respondeu corretamente.'
+          : 'Proxy de survey nao configurado. Defina SURVEY_PROXY_TARGET no ambiente do Vite para apontar ao Apps Script.',
       );
     }
 
@@ -72,7 +83,7 @@ export async function syncSurveyData(options) {
     body.set('period', period);
   }
 
-  const response = await fetch(SURVEY_API_PATH, {
+  const response = await fetch(getSurveyApiUrl(), {
     method: 'POST',
     headers: {
       Accept: 'application/json',
